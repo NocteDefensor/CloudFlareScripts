@@ -4,8 +4,11 @@
 
 CF_Token=
 AccountID=
-ListID=
- 
+ListID=(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
+-H "Authorization: Bearer $CF_Token" \
+-H "Content-Type:application/json" \
+| jq '.result[] |.id' | tr -d '"')
+
 # Get New IPLIST from ET
 curl https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt > /tmp/iplist.txt
 egrep '[0-9]{1,3}(?:\.[0-9]{1,3}){0,3}/[0-9]+' /tmp/iplist.txt > /tmp/newlist.txt
