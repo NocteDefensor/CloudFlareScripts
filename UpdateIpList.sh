@@ -25,7 +25,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/list
 itemid=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists/$ListID/items?" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
-| jq '.[] | .[] | .id')
+| jq '.result[] |.id')
 
 curl -X DELETE "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists/$ListID/items" \
 -H "Authorization: Bearer $CF_Token" \
