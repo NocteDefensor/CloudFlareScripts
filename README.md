@@ -19,3 +19,8 @@ This repository is for scripts meant to assist in admin functions for Cloudflare
 - test by running `./UpdateIpList.sh`
 - set cron job. 
 
+
+### Acknowledgements
+- Thanks to the author of this blog for a bit of inspiration and guidance on interacting with cloudflare API.
+  - https://www.xfelix.com/2021/10/simple-script-update-cloudflare-firewall-ip-list/
+
