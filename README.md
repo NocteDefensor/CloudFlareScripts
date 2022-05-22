@@ -1,20 +1,27 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+This repository is for scripts meant to assist in admin functions for Cloudflare WAF. 
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+1.	UpdateIPList.sh
+    - This script will pull down a list of IP's from Emerging threat's IP block list URL. It will then extract the IP and CIDR ranges and print them to a new text file. It will then iterate over that list of ip's and CIDR ranges and perform curl's to do the following:
+      - Remove all previous IP's in cloudflare IP LIST. 
+      - Add new IP's to list.
+    - This should be run as a cron job daily
+    - Instructions
+      - create and get your Cloudflare API key
+      - Copy your Account ID
+      - Git clone this repo or copy the contents of UpdateIPList.sh
+      - Create a IP list in cloudflare and retrieve list ID by using following curl command
+```
+CF_Token=YourAPIToken
+AccountID=YourAccountID
+curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
+-H "Authorization: Bearer $CF_Token" \
+-H "Content-Type:application/json"
+```
+      - Add your values to the variables in to the script
+      - perform `chmod +x UpdateIpList.sh`
+      - test by running `./UpdateIpList.sh`
+      - set cron job. 
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
-
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
