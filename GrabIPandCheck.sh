@@ -6,13 +6,11 @@ ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/r
 -H "Content-Type:application/json" \
 | jq '.result[] |.id' | tr -d '"')
 # scrub nginx access logs for either 404 responses to an attempt to access wp-login.php or 403 responses and outputs to txt file
-cat access.log | grep ' 404 '| sort -u | grep -i wp-login* | awk '{print $1}' > ~/sortingIP.txt && \
-cat access.log | grep ' 403 '| sort -u | awk '{print $1}' >> ~/sortingIP.txt && \
-cat ~/sortingIP.txt | sort -u > ~/Badip.txt && \
-rm -f ~/sortingIP.txt
+cat access.log | grep ' 404 '| sort -u | grep -i wp-login* | awk '{print $1}' > ~/Badip.txt && \
+cat access.log | grep ' 403 '| sort -u | awk '{print $1}' >> ~/Badip.txt
 
 # reads ips from text file and checks them against greynoise community API with curl command
-for ip in $(cat ~/Badip.txt); do
+for ip in $(cat ~/Badip.txt | sort -u); do
 noise=$(curl --request GET \
 --url https://api.greynoise.io/v3/community/$ip \
 --header 'Accept: application/json' \
