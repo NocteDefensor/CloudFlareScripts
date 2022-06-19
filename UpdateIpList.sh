@@ -21,6 +21,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/list
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 --data '[{"ip": "10.0.0.1","comment": "test ip"}]'
+sleep 1
 
 itemid=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists/$ListID/items?" \
 -H "Authorization: Bearer $CF_Token" \
@@ -31,7 +32,7 @@ curl -X DELETE "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/l
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 --data '{"items":[{"id":'$itemid'}]}'
-
+sleep 1
  # update the list item
 for IP in $(cat /tmp/newlist.txt); do
 curl -X POST "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists/$ListID/items" \
