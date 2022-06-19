@@ -1,25 +1,83 @@
 #!/bin/bash
-CF_Token=
-AccountID=
+############################################################
+# Help                                                     #
+############################################################
+Help()
+{
+   # Display Help
+   printf ""
+   printf "Syntax: scriptTemplate [-P|C|G|h|a]"
+   printf "options:"
+   printf "p     Specifies path to NGINX access.log. REQUIRED"
+   printf "h     Print this Help."
+   printf "c     Enables sending IP's to cloudflare.\nIf enabled you must make a credential file with that title in the same directory as this script\nPlace the credentials in there like this\nCF_Token=YourCredential\nAccountID=YourAccountID"
+   printf "g     Pass your Greynoise Community API key."
+   printf "a     Perform further analysis on the IP's that require further investigation."
+   printf " Example Command Usage ./GrabIPandCheck.sh -c -p /var/log/nginx/access.log -g YourAPIHere"
+   echo
+}
+# Main program                                             #
+############################################################
+############################################################
+
+# Set variables
+
+# CF_Token= these are passed via credential file in same directory as the script
+# AccountID= these are passed via credential file in same directory as the script
+Cloudflare="false"
+logpath="/var/log/nginx/access.log"
+greynoise=""
+analysis="false"
+# Process the input options. Add options as needed.        #
+############################################################
+# Get the options
+while getopts ":hcp:g:a" option; do
+   case $option in
+      h) # display Help
+         Help
+         exit;;
+      c) # Set Cloudflare to true
+         Cloudflare="true";;
+      p) # Set path to logs
+         logpath=$OPTARG;;
+      g) # Set GreyNoise API
+         greynoise=$OPTARG;;
+      a) # Set analysis to true
+         analysis="true";;
+     \?) # Invalid option
+         echo "Error: Invalid option"
+         exit;;
+   esac
+done
+#### Get LIST ID Variable if cloudflare options used
+if [[ "$Cloudflare" = "true" ]]; then
+        echo "reading cloudflare creds from credential file and setting ListID variable"
+        . "$(dirname "$0")"/credential
 ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 | jq '.result[] |.id' | tr -d '"')
-# scrub nginx access logs for either 404 responses to an attempt to access wp-login.php or 403 responses and outputs to txt file
-cat access.log | grep ' 404 '| sort -u | grep -i wp-login* | awk '{print $1}' > ~/Badip.txt && \
-cat access.log | grep ' 403 '| sort -u | awk '{print $1}' >> ~/Badip.txt
+else
+    "Cloudflare options was not selected. Continuing without Cloudflare"
+fi
 
+# scrub nginx access logs for either 404 responses to an attempt to access wp-login.php or 403 responses and outputs to txt file
+echo "${logpath}"
+cat $logpath | grep ' 404 '| sort -u | grep -i wp-login* | awk '{print $1}' > ~/Badip.txt && \
+cat $logpath | grep ' 403 '| sort -u | awk '{print $1}' >> ~/Badip.txt
 # reads ips from text file and checks them against greynoise community API with curl command
 for ip in $(cat ~/Badip.txt | sort -u); do
 noise=$(curl --request GET \
 --url https://api.greynoise.io/v3/community/$ip \
 --header 'Accept: application/json' \
---header 'key: '$1 | jq '. | .noise')
-if [[ "$noise" = "true" ]]; then
+--header 'key: '$greynoise | jq '. | .noise')
+if [[ "$noise" = "true" ]] && [[ "$Cloudflare" = "true" ]]; then
             echo "${ip} is noise" >> ~/noisyip.txt && curl -X POST "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists/$ListID/items" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 --data '[{"ip":"'$ip'","comment":"Noisy IP"}]'
+elif [[ "$noise" = "true" ]] && [[ "$Cloudflare" = "false" ]]; then
+            echo "${ip} is noise but it wasn't sent to Cloudflare" >> ~/noisyip.txt
 else
             echo "${ip} may require further investigation" && echo "${ip}" >> ~/investigateip.txt
 fi
