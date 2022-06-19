@@ -4,7 +4,7 @@
 
 CF_Token=
 AccountID=
-ListID=(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
+ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 | jq '.result[] |.id' | tr -d '"')
