@@ -19,6 +19,15 @@ This repository is for scripts meant to assist in admin functions for Cloudflare
 - test by running `./UpdateIpList.sh`
 - set cron job. 
 
+2.GrabIPandCheck.sh
+- This script will scrub nginx access logs for a 404 response to attempt to access wp-login page. It will also check for any 403 response and output the results of both of these to a file. It will then iterate over this file of Ip's and check each IP against the community API for Greynoise. If the API returns a value of "true" for the "noise" parameter, then this script will send that IP to cloudflare IP list for blocking. 
+## Instructions
+- You must pass this script a positional argument containing your grey noise API key
+- You must save your Cloudflare Token inside the script(If you wish to replace this with a flag argument feel free. I may do so in the future so I can pass it from a secret vault)
+- EX: ./GrabIPandCheck.sh 3473437473473437437
+  - Where 3473437473473437437 equals your API key
+- This should be run as a cron job daily
+
 
 ### Acknowledgements
 - Thanks to the author of this blog for a bit of inspiration and guidance on interacting with cloudflare API.
