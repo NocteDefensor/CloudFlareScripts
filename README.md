@@ -2,7 +2,16 @@
 This repository is for scripts meant to assist in admin functions for Cloudflare WAF. 
 
 # Getting Started
-
+## Requirements
+- Must have jq installed
+  - debian based `sudo apt-get install jq`
+  - CentOS
+  ```
+  yum install epel-release -y
+  yum update -y
+  yum install jq -y
+  jq -Version
+  ```
 1.	UpdateIPList.sh
 - This script will pull down a list of IP's from Emerging threat's IP block list URL. It will then extract the IP and CIDR ranges and print them to a new text file. It will then iterate over that list of ip's and CIDR ranges and perform curl's to do the following:
 - Remove all previous IP's in cloudflare IP LIST. 
