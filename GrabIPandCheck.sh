@@ -14,7 +14,7 @@ Help()
    printf "g     Pass your Greynoise Community API key.\n"
    printf "a     Perform further analysis on the IP's that require further investigation.\n"
    printf " Example Command Usage ./GrabIPandCheck.sh -c -p /var/log/nginx/access.log -g YourAPIHere"
-   echo
+   printf " \n"
 }
 # Main program                                             #
 ############################################################
