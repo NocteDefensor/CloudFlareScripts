@@ -85,7 +85,7 @@ else
 fi
 done
 if [[ "$analysis" = "true" ]]; then
-            printf "Performing additional analysis.\nLooking for additional entries in access logs for each IP.\nSorting and providing an unique count.\n"
+            printf "Performing additional analysis.\nLooking for additional entries in access logs for each IP.\nSorting and providing an unique count.\nLook for output in longtail.txt within your home directory\n"
             printf " "
     for ip in $(cat ~/investigateip.txt | sort -u); do
     cat $logpath | grep $ip | awk '{print $1,$6,$7,$9}' >> ~/workinganalysis.txt && cat ~/workinganalysis.txt | tr -d '"' | sort| uniq -c | sort -n > ~/longtail.txt
