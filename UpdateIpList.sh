@@ -1,13 +1,18 @@
 #!/bin/bash
  
 ## Cloudflare IP list update
-
-CF_Token=
-AccountID=
-ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
+. "$(dirname "$0")"/credential
+# CF_Token= These are passed via the credential file that needs to be in same directory
+# AccountID= These are passed via the credential file that needs to be in same directory
+if [[ "$ListID" != "" ]]; then
+echo "ListID was set within credential file."
+else 
+echo "setting ListID variable"
+ ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 | jq '.result[] |.id' | tr -d '"')
+fi
 
 # Get New IPLIST from ET
 curl https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt > /tmp/iplist.txt
