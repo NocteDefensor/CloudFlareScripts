@@ -5,14 +5,14 @@
 Help()
 {
    # Display Help
-   printf ""
-   printf "Syntax: scriptTemplate [-P|C|G|h|a]"
-   printf "options:"
-   printf "p     Specifies path to NGINX access.log. REQUIRED"
-   printf "h     Print this Help."
-   printf "c     Enables sending IP's to cloudflare.\nIf enabled you must make a credential file with that title in the same directory as this script\nPlace the credentials in there like this\nCF_Token=YourCredential\nAccountID=YourAccountID"
-   printf "g     Pass your Greynoise Community API key."
-   printf "a     Perform further analysis on the IP's that require further investigation."
+   printf "\n"
+   printf "Syntax: scriptTemplate [-P|C|G|h|a]\n"
+   printf "options:\n"
+   printf "p     Specifies path to NGINX access.log. REQUIRED\n"
+   printf "h     Print this Help.\n"
+   printf "c     Enables sending IP's to cloudflare.\nIf enabled you must make a credential file with that title in the same directory as this script\nPlace the credentials in there like this\nCF_Token=YourCredential\nAccountID=YourAccountID\n"
+   printf "g     Pass your Greynoise Community API key.\n"
+   printf "a     Perform further analysis on the IP's that require further investigation.\n"
    printf " Example Command Usage ./GrabIPandCheck.sh -c -p /var/log/nginx/access.log -g YourAPIHere"
    echo
 }
