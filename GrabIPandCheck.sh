@@ -24,6 +24,7 @@ Help()
 
 # CF_Token= these are passed via credential file in same directory as the script
 # AccountID= these are passed via credential file in same directory as the script
+. "$(dirname "$0")"/credential
 Cloudflare="false"
 logpath="/var/log/nginx/access.log"
 greynoise=""
@@ -50,20 +51,20 @@ while getopts ":hcp:g:a" option; do
    esac
 done
 #### Get LIST ID Variable if cloudflare options used
-if [[ "$Cloudflare" = "true" ]]; then
+if [[ "$Cloudflare" = "true" ]] && [[ "$ListID" = "" ]]; then
         echo "reading cloudflare creds from credential file and setting ListID variable"
-        . "$(dirname "$0")"/credential
 ListID=$(curl -X GET "https://api.cloudflare.com/client/v4/accounts/$AccountID/rules/lists" \
 -H "Authorization: Bearer $CF_Token" \
 -H "Content-Type:application/json" \
 | jq '.result[] |.id' | tr -d '"')
-else
-    "Cloudflare options was not selected. Continuing without Cloudflare"
+elif [[ "$Cloudflare" = "true" ]] && [[ "$ListID" != "" ]]; then
+        echo "LISTID was set within credential file."
+else    echo "Cloudflare option wasn't selected."
 fi
 
 # scrub nginx access logs for either 404 responses to an attempt to access wp-login.php or 403 responses and outputs to txt file
 echo "${logpath}"
-cat $logpath | grep ' 404 '| sort -u | grep -i wp-login* | awk '{print $1}' > ~/Badip.txt && \
+cat $logpath | grep ' 404 '| sort -u | awk '{print $1}' > ~/Badip.txt && \
 cat $logpath | grep ' 403 '| sort -u | awk '{print $1}' >> ~/Badip.txt
 # reads ips from text file and checks them against greynoise community API with curl command
 for ip in $(cat ~/Badip.txt | sort -u); do
@@ -80,5 +81,14 @@ elif [[ "$noise" = "true" ]] && [[ "$Cloudflare" = "false" ]]; then
             echo "${ip} is noise but it wasn't sent to Cloudflare" >> ~/noisyip.txt
 else
             echo "${ip} may require further investigation" && echo "${ip}" >> ~/investigateip.txt
+
 fi
 done
+if [[ "$analysis" = "true" ]]; then
+            printf "Performing additional analysis.\nLooking for additional entries in access logs for each IP.\nSorting and providing an unique count.\n"
+            printf " "
+    for ip in $(cat ~/investigateip.txt | sort -u); do
+    cat $logpath | grep $ip | awk '{print $1,$6,$7,$9}' >> ~/workinganalysis.txt && cat ~/workinganalysis.txt | tr -d '"' | sort| uniq -c | sort -n > ~/longtail.txt
+done
+else echo "Further analysis option was not selected"
+fi
