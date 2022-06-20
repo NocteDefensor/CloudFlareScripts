@@ -14,7 +14,7 @@ This repository is for scripts meant to assist in admin functions for Cloudflare
 - Git clone this repo or copy the contents of UpdateIPList.sh
 - Create a IP list in cloudflare and retrieve list ID by using following curl command
   - This script assumed you have 1 IP list. If you have more then 1, you will need to tailor this script to select the right listid and assign it to the listid variable
-- Add your values to the variables in to the script
+- Add your Cloudflare Credentials to the credential file in the same directory as this script
 - perform `chmod +x UpdateIpList.sh`
 - test by running `./UpdateIpList.sh`
 - set cron job. 
